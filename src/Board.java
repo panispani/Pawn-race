@@ -78,19 +78,19 @@ public class Board {
     public void display() {
 
         //File names
-        System.out.println("    A B C D E F G H\n");
+        System.out.println("   A B C D E F G H\n");
 
         for(int rank = 8; rank > 0; rank--) {
             System.out.print(rank + "  ");
             for(int file = 1; file <= 8; file++) {
                 Color occupier = board[file - 1][rank - 1].occupiedBy();
                 char c = colorToSymbol(occupier);
-                System.out.print(c);
+                System.out.print(c + " ");
             }
-            System.out.println("  " + rank);
+            System.out.println(" " + rank);
         }
 
-        System.out.println("\n    A B C D E F G H\n");
+        System.out.println("\n   A B C D E F G H\n");
     }
 
 }
