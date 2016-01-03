@@ -109,12 +109,27 @@ public class GameUtil {
         return false;
     }
 
-    private static int getDirectionOfPawn(Color pawn) {
+    public static boolean haveMovedPawn(int rank, Color playerColor) {
+        switch(playerColor){
+            case WHITE: return rank == 1;
+            case BLACK: return rank == 6;
+            default: assert(true): "Player should be BLACK/WHITE"; return false;
+        }
+    }
+
+    public static int getDirectionOfPawn(Color pawn) {
         switch(pawn) {
             case WHITE: return 1;
             case BLACK: return -1;
             default: assert(true): "Pawn should be WHITE/BLACK"; return 0;
         }
+    }
+
+    public static boolean moveIsEnPassant(Move move) {
+        Square from = move.getFrom();
+        Square to = move.getTo();
+
+        return (Math.abs(from.getY() - to.getY()) == 2);
     }
 
     public static boolean validMove(Square from, Square to, boolean isCapture,
@@ -137,7 +152,7 @@ public class GameUtil {
                     (to.getY() == from.getY() + direction) &&
                     (fileDifference == 1 || fileDifference == -1) &&
                     (enPassantPawn.occupiedBy() == oppositePlayer(player)) &&
-                    (lastTo.getY() - lastFrom.getY() == 2) &&
+                    (Math.abs(lastTo.getY() - lastFrom.getY()) == 2) &&
                     (lastTo.getX() == enPassantPawn.getX()) &&
                     (lastTo.getY() == enPassantPawn.getY()))//that was the pawn moved
                 return true;
