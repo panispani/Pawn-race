@@ -93,7 +93,12 @@ public class Game {
     public Move parseMove(String san) {
         //return move object from standard algebraic notation
         //null if not valid
-        return null;
+
+        Move lastMove = null;
+        if(nextMoveIndex > 0)
+            lastMove = Moves[nextMoveIndex - 1];
+
+        return GameUtil.stringToMove(san, lastMove, nextMoveIndex, board, currentPlayer);
     }
 
 

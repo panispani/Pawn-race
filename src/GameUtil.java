@@ -116,4 +116,90 @@ public class GameUtil {
             default: assert(true): "Pawn should be WHITE/BLACK"; return 0;
         }
     }
+
+    public static boolean validMove(Square from, Square to, boolean isCapture,
+                                    boolean isEnPassantCapture, Board board, Color player,
+                                    Move lastMove) {
+
+        if(from.occupiedBy() != player || to.occupiedBy() == player)
+            return false;
+
+        int direction = getDirectionOfPawn(player); // +1 for White, -1 for Black
+        if(isEnPassantCapture) {
+
+            int fileDifference = to.getX() - from.getX();
+            if(to.getY() - direction < 0) return false;
+            Square lastFrom = lastMove.getFrom();
+            Square lastTo = lastMove.getTo();
+
+            Square enPassantPawn = board.getSquare(to.getX(), to.getY() - direction);
+            if(to.occupiedBy() == Color.NONE &&
+                    (to.getY() == from.getY() + direction) &&
+                    (fileDifference == 1 || fileDifference == -1) &&
+                    (enPassantPawn.occupiedBy() == oppositePlayer(player)) &&
+                    (lastTo.getY() - lastFrom.getY() == 2) &&
+                    (lastTo.getX() == enPassantPawn.getX()) &&
+                    (lastTo.getY() == enPassantPawn.getY()))//that was the pawn moved
+                return true;
+            else
+                return false;
+
+        } else if(isCapture) {
+            if(to.occupiedBy() == oppositePlayer(player) &&
+                    (from.getX() + 1 == to.getX() || from.getX() - 1 == to.getX()) &&
+                    (from.getY() + direction == to.getY()))
+                return true;
+            return false;
+        } else {
+            if((from.getY() == to.getY() - 1 || from.getY() == to.getY() - 2) &&
+                    (from.getX() == to.getX()) && to.occupiedBy() == Color.NONE &&
+                    (board.getSquare(from.getX(), from.getY() + 1).occupiedBy() == Color.NONE))
+                return true;
+            return false;
+        }
+    }
+
+    public static Move stringToMove(String san, Move lastMove, int nextMoveIndex, Board board, Color player) {
+
+        if(san.length() != 5) //weak check, if notation is changed later must change too 
+            return null;
+
+        String squareString;
+        squareString = san.substring(0, 2);
+        Square from = notationToSquare(squareString, board);
+        squareString = san.substring(3, 5);
+        Square to = notationToSquare(squareString, board);
+        boolean isCapture = san.contains("x");
+        boolean isEnPassantCapture = isCapture && (to.occupiedBy() == Color.NONE);
+        
+        //check if it's valid
+
+        //extra care, in this case lastMove is null
+        if(nextMoveIndex == 0) {
+            if(from.occupiedBy() == player && to.getX() == from.getX()
+                    && (to.getY() == from.getY() + 1 || to.getY() == from.getY() + 2)) {
+                Move move = new Move(from, to, isCapture, isEnPassantCapture);
+                return move;
+            }
+            //invalid move
+            return null;
+        }
+
+        //normal move, able to use lastMove
+        if(validMove(from, to, isCapture, isEnPassantCapture, board, player, lastMove)) {
+            Move move = new Move(from, to, isCapture, isEnPassantCapture);
+            return move;
+        }
+
+        return null;
+    }
+    private static Square notationToSquare(String squareString, Board board) {
+        assert(squareString.length() == 2):
+                "squareString should only have 2 characters";
+        int file = squareString.charAt(0) - 'A';
+        int rank = squareString.charAt(1) - '0';
+        //reference to the board square
+        Square square = board.getSquare(file, rank);
+        return square;
+    }
 }
