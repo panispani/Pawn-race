@@ -23,16 +23,12 @@ public class Game {
             return Moves[nextMoveIndex - 1];
     }
 
-    private Color nextPlayer(Color color) {
-        return color == Color.WHITE ? Color.BLACK : Color.WHITE;
-    }
-
     public void applyMove(Move move) {
 
         Moves[nextMoveIndex] = move;
         nextMoveIndex++;
         board.applyMove(move);
-        currentPlayer = nextPlayer(currentPlayer);
+        currentPlayer = GameUtil.oppositePlayer(currentPlayer);
 
     }
 
@@ -40,59 +36,65 @@ public class Game {
 
         if (nextMoveIndex > 0) {
             board.unapplyMove(Moves[nextMoveIndex - 1]);
-            currentPlayer = nextPlayer(currentPlayer);
+            currentPlayer = GameUtil.oppositePlayer(currentPlayer);
             nextMoveIndex--;
         }
 
     }
 
-    //helper function for isFinished()
-    private boolean canMove(int file, int rank, Color player) {
+    public boolean isFinished() {
 
-        int direction = 0;
-        switch (player) {
-            case BLACK:
-                direction = +1;
-                break;
-            case WHITE:
-                direction = -1;
-                break;
-            default:
-                assert (true) : "Player should be BLACK/WHITE";
-                break;
-        }
+        if(nextMoveIndex < 1)
+            return false;
 
-        //move forward
-        if (board.getSquare(file, rank + direction).occupiedBy() == Color.NONE)
+        //last move was a winning move - pawn promotion
+        if(GameUtil.pawnOnLastRank(board, Color.WHITE) ||
+                GameUtil.pawnOnLastRank(board, Color.BLACK))
             return true;
 
-        //capture
-        if (file < 7 && board.getSquare(file + 1, rank + direction).occupiedBy() == nextPlayer(player))
+        //all pawns of a color are captured
+        //current player has no valid moves - stealmate
+        //nextMove index is at least 1
+        Move lastMove = Moves[nextMoveIndex - 1];
+        if(GameUtil.stealMate(board, currentPlayer, lastMove) ||
+                GameUtil.whiteIsOutOfPawns(board) ||
+                GameUtil.blackIsOutOfPawns(board))
             return true;
-
-        if (file > 0 && board.getSquare(file - 1, rank + direction).occupiedBy() == nextPlayer(player))
-            return true;
-
-        //enpassant capture
-
-
-        return false;
+        else
+            return false;
 
     }
 
-    //helper function for isFinished()
-    private boolean currentPlayerHasNoMoves(int whiteMoves, int blackMoves) {
+    public Color getGameResult() {
 
-        switch (currentPlayer) {
-            case WHITE:
-                return whiteMoves == 0;
-            case BLACK:
-                return blackMoves == 0;
+        if(isFinished()){
+
+            assert(nextMoveIndex > 0):
+                    "No moves have been played, game shouldn't be over";
+
+            if(GameUtil.pawnOnLastRank(board, Color.WHITE))
+                return Color.WHITE;
+            if(GameUtil.pawnOnLastRank(board, Color.BLACK))
+                return Color.BLACK;
+            Move lastMove = Moves[nextMoveIndex - 1];
+            if(GameUtil.stealMate(board, currentPlayer, lastMove))
+                return Color.NONE;
+            if(GameUtil.whiteIsOutOfPawns(board))
+                return Color.BLACK;
+            if(GameUtil.blackIsOutOfPawns(board))
+                return Color.WHITE;
+            assert(true):
+                    "Game shouldn't be finished";
+
         }
-
-        assert (true) :
-                "Player should be Black or White";
-        return false;
-
+        return null;
     }
+
+    public Move parseMove(String san) {
+        //return move object from standard algebraic notation
+        //null if not valid
+        return null;
+    }
+
+
 }
