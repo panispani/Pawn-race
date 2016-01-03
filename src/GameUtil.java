@@ -217,4 +217,12 @@ public class GameUtil {
         Square square = board.getSquare(file, rank);
         return square;
     }
+
+    public static String gameResults(Color winner){
+        switch(winner) {
+            case WHITE: return "WHITE HAS WON!!";
+            case BLACK: return "BLACK HAS WON!!";
+            default:  return "STEALMATE!!";
+        }
+    }
 }
