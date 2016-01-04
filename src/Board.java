@@ -42,7 +42,9 @@ public class Board {
         Color pawnColor = board[fromX][fromY].occupiedBy();
         board[fromX][fromY].setOccupier(Color.NONE);
         board[toX][toY].setOccupier(pawnColor);
-
+        int direction = GameUtil.getDirectionOfPawn(pawnColor);
+        if(move.isEnPassantCapture())
+            board[toX][toY - direction].setOccupier(Color.NONE);
     }
 
     public void unapplyMove(Move move) {
