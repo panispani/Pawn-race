@@ -1,3 +1,4 @@
+import java.net.SocketPermission;
 import java.util.Scanner;
 
 /**
@@ -21,7 +22,7 @@ public class PawnRace {
         String moveSAN;
         Move move;
 
-        while(game.isFinished()) {
+        while(!game.isFinished()) {
             board.display();
             if(playerTurn == 1) {
 
@@ -29,6 +30,7 @@ public class PawnRace {
                     System.out.println("Play your move! ");
                     moveSAN = input.next();
                     move = game.parseMove(moveSAN);
+                    System.out.println(move.getFrom().getX());
                     game.applyMove(move);
                 } else {
                     p1.makeMove();

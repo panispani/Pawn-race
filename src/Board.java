@@ -24,6 +24,11 @@ public class Board {
     }
 
     public Square getSquare(int x, int y) {
+        if (x < 0 || x > 7 || y < 0 || y > 7) {
+            System.out.println("mom");
+            return new Square(-1, -1);
+        }
+
         return board[x][y];
     }
 

@@ -97,7 +97,7 @@ public class Game {
         Move lastMove = null;
         if(nextMoveIndex > 0)
             lastMove = Moves[nextMoveIndex - 1];
-
+        System.out.println("pasing..1");
         return GameUtil.stringToMove(san, lastMove, nextMoveIndex, board, currentPlayer);
     }
 
