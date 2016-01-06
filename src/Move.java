@@ -10,8 +10,8 @@ public class Move {
 
     public Move(Square from, Square to, boolean isCapture, boolean isEnPassantCapture) {
 
-        this.from               = from;
-        this.to                 = to;
+        this.from               = new Square(from.getX(), from.getY());
+        this.to                 = new Square(to.getX(), to.getY());
         this.isCapture          = isCapture;
         this.isEnPassantCapture = isEnPassantCapture;
 
