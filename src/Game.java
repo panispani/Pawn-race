@@ -52,17 +52,18 @@ public class Game {
                 GameUtil.pawnOnLastRank(board, Color.BLACK))
             return true;
 
-        //all pawns of a color are captured
         //current player has no valid moves - stealmate
         //nextMove index is at least 1
         Move lastMove = Moves[nextMoveIndex - 1];
-        if(GameUtil.stealMate(board, currentPlayer, lastMove) ||
-                GameUtil.whiteIsOutOfPawns(board) ||
+        if(GameUtil.stealMate(board, currentPlayer, lastMove))
+            return true;
+
+        //all pawns of a color are captured
+        if(GameUtil.whiteIsOutOfPawns(board) ||
                 GameUtil.blackIsOutOfPawns(board))
             return true;
-        else
-            return false;
 
+        return false;
     }
 
     public Color getGameResult() {
@@ -97,7 +98,6 @@ public class Game {
         Move lastMove = null;
         if(nextMoveIndex > 0)
             lastMove = Moves[nextMoveIndex - 1];
-        System.out.println("pasing..1");
         return GameUtil.stringToMove(san, lastMove, nextMoveIndex, board, currentPlayer);
     }
 
