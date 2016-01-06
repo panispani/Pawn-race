@@ -6,17 +6,25 @@ public class Board {
     private Square[][] board = new Square[8][8];
 
     public Board(char whiteGap, char blackGap) {
-        //initial board setup
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
 
-                board[i][j] = new Square(i, j);
-                if(j == 1 && whiteGap != i + 'A') {             //white row
-                    board[i][j].setOccupier(Color.WHITE);
-                } else if (j == 6 && blackGap != i + 'A') {     //black row
-                    board[i][j].setOccupier(Color.BLACK);
+        //pre - whiteGap, blackGap are UpperCase from 'A' to 'H'
+        whiteGap = Character.toUpperCase(whiteGap);
+        blackGap = Character.toUpperCase(blackGap);
+        assert(whiteGap >= 'A' && blackGap >= 'A' &&
+                whiteGap <= 'H' && blackGap <= 'H'):
+                "invalid pawn gaps";
+
+        //initial board setup
+        for(int file = 0; file < 8; file++) {
+            for(int rank = 0; rank < 8; rank++) {
+
+                board[file][rank] = new Square(file, rank);
+                if(rank == 1 && whiteGap != file + 'A') {             //white row
+                    board[file][rank].setOccupier(Color.WHITE);
+                } else if (rank == 6 && blackGap != file + 'A') {     //black row
+                    board[file][rank].setOccupier(Color.BLACK);
                 } else {
-                    board[i][j].setOccupier(Color.NONE);
+                    board[file][rank].setOccupier(Color.NONE);
                 }
 
             }
@@ -25,7 +33,7 @@ public class Board {
 
     public Square getSquare(int x, int y) {
         if (x < 0 || x > 7 || y < 0 || y > 7) {
-            System.out.println("mom");
+            System.out.println("possible error " + x + " " + y);
             return new Square(-1, -1);
         }
 
@@ -36,7 +44,6 @@ public class Board {
 
         int fromX = move.getFrom().getX();
         int fromY = move.getFrom().getY();
-        System.out.println(board[fromX][fromY].occupiedBy());
         int toX   = move.getTo().getX();
         int toY   = move.getTo().getY();
         Color pawnColor = board[fromX][fromY].occupiedBy();
@@ -53,16 +60,17 @@ public class Board {
         int fromY = move.getFrom().getY();
         int toX = move.getTo().getX();
         int toY = move.getTo().getY();
-        Color pawnColor = board[fromX][fromY].occupiedBy();
+        Color pawnColor = board[toX][toY].occupiedBy();
 
         board[fromX][fromY].setOccupier(pawnColor);
 
         if (move.isEnPassantCapture()) {
             //enPassant 'to' pawn has the same y coordinate as 'from' pawn
-            Color opponentColor = pawnColor == Color.BLACK ? Color.WHITE : Color.BLACK;
+            board[toX][toY].setOccupier(Color.NONE);
+            Color opponentColor = GameUtil.oppositePlayer(pawnColor);
             board[toX][fromY].setOccupier(opponentColor);
         } else if (move.isCapture()) {
-            Color opponentColor = pawnColor == Color.BLACK ? Color.WHITE : Color.BLACK;
+            Color opponentColor = GameUtil.oppositePlayer(pawnColor);
             board[toX][toY].setOccupier(opponentColor);
         } else {
             board[toX][toY].setOccupier(Color.NONE);
