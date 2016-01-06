@@ -17,6 +17,13 @@ public class Move {
 
     }
 
+    public Move(Move move) {
+        this.from               = move.getFrom();
+        this.to                 = move.getTo();
+        this.isCapture          = move.isCapture();
+        this.isEnPassantCapture = move.isEnPassantCapture();
+    }
+
     public Square getFrom() {
         return from;
     }

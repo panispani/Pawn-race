@@ -74,16 +74,18 @@ public class Player {
 
             //capture
             if(file > 0) {
-                if(board.getSquare(file - 1, rank - direction).occupiedBy() == opponentColor) {
-                    to = board.getSquare(file - 1, rank - direction);
+                if(board.getSquare(file - 1, rank + direction).occupiedBy() == opponentColor) {
+                    to = board.getSquare(file - 1, rank + direction);
                     move = new Move(from, to, true, false);
+                    moveList.add(move);
                 }
             }
 
             if(file < 7) {
-                if(board.getSquare(file + 1, rank - direction).occupiedBy() == opponentColor) {
-                    to = board.getSquare(file + 1, rank - direction);
+                if(board.getSquare(file + 1, rank + direction).occupiedBy() == opponentColor) {
+                    to = board.getSquare(file + 1, rank + direction);
                     move = new Move(from, to, true, false);
+                    moveList.add(move);
                 }
             }
 
@@ -93,27 +95,30 @@ public class Player {
             if(lastMove != null) {
                 if(file > 0) {
                     if(board.getSquare(file - 1, rank).occupiedBy() == opponentColor &&
-                            (board.getSquare(file - 1, rank - direction).occupiedBy() == Color.NONE) &&
+                            (board.getSquare(file - 1, rank + direction).occupiedBy() == Color.NONE) &&
                             GameUtil.moveIsEnPassant(lastMove) &&
                             (lastMove.getTo(). getX() == file - 1) &&
                             (lastMove.getTo().getY() == rank)) {
                         to = board.getSquare(file - 1, rank + direction);
                         move = new Move(from, to, true, true);
+                        moveList.add(move);
                     }
 
                     if(file < 7) {
                         if (board.getSquare(file + 1, rank).occupiedBy() == opponentColor &&
-                                (board.getSquare(file + 1, rank - direction).occupiedBy() == Color.NONE) &&
+                                (board.getSquare(file + 1, rank + direction).occupiedBy() == Color.NONE) &&
                                 GameUtil.moveIsEnPassant(lastMove) &&
                                 (lastMove.getTo().getX() == file + 1) &&
                                 (lastMove.getTo().getY() == rank)) {
                             to = board.getSquare(file + 1, rank + direction);
                             move = new Move(from, to, true, true);
+                            moveList.add(move);
                         }
                     }
                 }
             }
         }
+        GameUtil.printValidMoves(moveList.toArray(new Move[moveList.size()]));
         return moveList.toArray(new Move[moveList.size()]);
     }
 
