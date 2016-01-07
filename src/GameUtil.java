@@ -4,7 +4,8 @@
 public class GameUtil {
     //utility class for Game class
 
-    public static Color oppositePlayer(Color color) {
+    public static Color oppositePlayer(Color color)
+    {
         return color == Color.WHITE ? Color.BLACK : Color.WHITE;
     }
 
@@ -45,7 +46,6 @@ public class GameUtil {
     }
 
     public static boolean stealMate(Board board, Color currentPlayer, Move lastMove) {
-
         for(int file = 0; file < 8; file++) {
             for(int rank = 0; rank < 8; rank++){
                 if(board.getSquare(file, rank).occupiedBy() == currentPlayer) {
@@ -60,6 +60,9 @@ public class GameUtil {
 
     private static boolean canMove(Board board, int file, int rank, Move lastMove) {
 
+        Color pawnColor = board.getSquare(file, rank).occupiedBy();
+        if(pawnOnLastRank(board, pawnColor))
+            return false;
         if(forwardMove(board, file, rank))
             return true;
         if(captureMove(board, file, rank))
@@ -77,6 +80,7 @@ public class GameUtil {
             return true;
         return false;
     }
+
     private static boolean captureMove(Board board, int file, int rank) {
         Color pawnColor = board.getSquare(file, rank).occupiedBy();
         int direction = getDirectionOfPawn(pawnColor);
@@ -91,6 +95,10 @@ public class GameUtil {
     }
 
     private static boolean enPassantCaptureMove(Board board, int file, int rank, Move lastMove) {
+
+       /* assert(lastMove == null):
+                "lastMove shouldn't be null";*/
+
         Color pawnColor = board.getSquare(file, rank).occupiedBy();
         int direction = getDirectionOfPawn(pawnColor);
 
@@ -111,8 +119,8 @@ public class GameUtil {
 
     public static boolean haveMovedPawn(int rank, Color playerColor) {
         switch(playerColor){
-            case WHITE: return rank == 1;
-            case BLACK: return rank == 6;
+            case WHITE: return rank != 1;
+            case BLACK: return rank != 6;
             default: assert(true): "Player should be BLACK/WHITE"; return false;
         }
     }
@@ -139,7 +147,6 @@ public class GameUtil {
         if(from.occupiedBy() != player || to.occupiedBy() == player)
             return false;
 
-        System.out.println("Possible valid move");
         int direction = getDirectionOfPawn(player); // +1 for White, -1 for Black
         if(isEnPassantCapture) {
 
@@ -180,13 +187,10 @@ public class GameUtil {
         if(san.length() != 5) //weak check, if notation is changed later must change too 
             return null;
 
-        System.out.println("correct size!");
         String squareString;
         squareString = san.substring(0, 2);
-        System.out.println(squareString);
         Square from = notationToSquare(squareString, board);
         squareString = san.substring(3, 5);
-        System.out.println(squareString);
         Square to = notationToSquare(squareString, board);
         boolean isCapture = san.contains("x");
         boolean isEnPassantCapture = isCapture && (to.occupiedBy() == Color.NONE);
@@ -195,7 +199,6 @@ public class GameUtil {
 
         //extra care, in this case lastMove is null
         if(nextMoveIndex == 0) {
-            System.out.println("First move" + from.getY());
             if(from.occupiedBy() == player && to.getX() == from.getX()
                     && (to.getY() == from.getY() + 1 || to.getY() == from.getY() + 2)) {
                 Move move = new Move(from, to, isCapture, isEnPassantCapture);
@@ -207,7 +210,6 @@ public class GameUtil {
         }
 
         //normal move, able to use lastMove
-        System.out.println("normal move!");
         if(validMove(from, to, isCapture, isEnPassantCapture, board, player, lastMove)) {
             Move move = new Move(from, to, isCapture, isEnPassantCapture);
             return move;
@@ -215,6 +217,7 @@ public class GameUtil {
         System.out.println("Invalid normal move!");
         return null;
     }
+
     private static Square notationToSquare(String squareString, Board board) {
         assert(squareString.length() == 2):
                 "squareString should only have 2 characters";
@@ -233,4 +236,25 @@ public class GameUtil {
             default:  return "STEALMATE!!";
         }
     }
+
+    public static void printValidMoves(Move[] moves) {
+        for(int i = 0; i < moves.length; i++) {
+            //assert(moves[i] == null): "move shouldn't be null";
+            if(moves[i] != null)
+            System.out.print(" " + moveToString(moves[i]));
+        }
+        System.out.println();
+    }
+
+    public static String moveToString(Move move) {
+        Square from = move.getFrom();
+        Square to = move.getTo();
+        String s;
+        char moveType = move.isCapture() ? 'x' : '-';
+        s = "" + (char)(from.getX() + 'a') + (char)(from.getY() + '1')
+               + moveType + (char)(to.getX() + 'a') + (char)(to.getY() + '1');
+        return s;
+    }
+
+
 }

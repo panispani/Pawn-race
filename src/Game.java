@@ -25,11 +25,13 @@ public class Game {
 
     public void applyMove(Move move) {
 
+        assert(move != null):
+                "applied move shouldn't be null";
+
         Moves[nextMoveIndex] = move;
         nextMoveIndex++;
         board.applyMove(move);
         currentPlayer = GameUtil.oppositePlayer(currentPlayer);
-
     }
 
     public void unapplyMove() {
@@ -54,8 +56,8 @@ public class Game {
 
         //current player has no valid moves - stealmate
         //nextMove index is at least 1
-        Move lastMove = Moves[nextMoveIndex - 1];
-        if(GameUtil.stealMate(board, currentPlayer, lastMove))
+
+        if(GameUtil.stealMate(board, currentPlayer, getLastMove()))
             return true;
 
         //all pawns of a color are captured
@@ -94,11 +96,7 @@ public class Game {
     public Move parseMove(String san) {
         //return move object from standard algebraic notation
         //null if not valid
-
-        Move lastMove = null;
-        if(nextMoveIndex > 0)
-            lastMove = Moves[nextMoveIndex - 1];
-        return GameUtil.stringToMove(san, lastMove, nextMoveIndex, board, currentPlayer);
+        return GameUtil.stringToMove(san, getLastMove(), nextMoveIndex, board, currentPlayer);
     }
 
 
