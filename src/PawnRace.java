@@ -21,18 +21,22 @@ public class PawnRace {
         Scanner input = new Scanner(System.in);
         String moveSAN;
         Move move;
-
+        board.display();
         while(!game.isFinished()) {
-            board.display();
-            if(playerTurn == 1) {
 
+            if(playerTurn == 1) {
                 if(isHumanPlayer1) {
-                    System.out.println("Play your move! ");
-                    moveSAN = input.next();
+                    
+                    do {
+                        System.out.println("Play your move! ");
+                        moveSAN = input.next();
+                    }while(!NotationUtil.validStringMove(moveSAN.toLowerCase(), Color.WHITE, board));
+                    moveSAN = NotationUtil.toStandardNotation(moveSAN, Color.WHITE, board);
                     move = game.parseMove(moveSAN);
-                    System.out.println(move.getFrom().getX());
                     game.applyMove(move);
+
                 } else {
+                    //AI
                     p1.makeMove();
                 }
                 playerTurn = 2;
@@ -40,18 +44,25 @@ public class PawnRace {
             } else {
 
                 if(isHumanPlayer2) {
-                    System.out.println("Play your move! ");
-                    moveSAN = input.next();
+
+                    do {
+                        System.out.println("Play your move! ");
+                        moveSAN = input.next();
+                    } while(!NotationUtil.validStringMove(moveSAN.toLowerCase(), Color.BLACK, board));
+                    moveSAN = NotationUtil.toStandardNotation(moveSAN, Color.BLACK, board);
+
                     move = game.parseMove(moveSAN);
                     game.applyMove(move);
+
                 } else {
+                    //AI
                     p2.makeMove();
                 }
                 playerTurn = 1;
 
             }
+            board.display();
         }
-
         Color winner = game.getGameResult();
         System.out.println(GameUtil.gameResults(winner));
     }
