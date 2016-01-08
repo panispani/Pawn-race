@@ -8,11 +8,13 @@ import java.util.Random;
 
 public class Player {
 
-    Board board;
-    Game game;
-    Color playerColor;
-    Color opponentColor;
-    boolean isComputerPlayer;
+    private Board board;
+    private Game game;
+    private Color playerColor;
+    private Color opponentColor;
+    private boolean isComputerPlayer;
+    private Move whiteNextMove;
+    private Move blackNextMove;
 
     public Player(Board board, Game game, Color color, boolean isComputerPlayer) {
         this.board         = board;
@@ -159,14 +161,12 @@ public class Player {
 
     public int minimax(int level, Color player, int alpha, int beta) {
         //ending condition
-        int nodeScore = 0;
+        int nodeScore;
         Move[] moves = getAllValidMoves();
 
-        if(moves.length == 0 || searchEndCondition()) {
-
-            ; //score calculation TODO
+        if(moves.length == 0 || level == 20 || searchEndCondition()) {
+            return scoreCalculation();//might need to also return a move
         }
-
 
         switch (player) {
             case WHITE:
@@ -176,7 +176,11 @@ public class Player {
                     nodeScore = minimax(level + 1, opponentColor, alpha, beta);
                     //unapply move
                     game.unapplyMove();
-                    if(nodeScore > alpha) alpha = nodeScore;
+                    if(nodeScore > alpha) {
+                        alpha = nodeScore;
+                        //update move
+                        this.whiteNextMove = moves[i];
+                    }
                     if(alpha >= beta) break; //no-need to consider further
                 }
                 return alpha;
@@ -185,7 +189,11 @@ public class Player {
                     game.applyMove(moves[i]);
                     nodeScore = minimax(level + 1, opponentColor, alpha, beta);
                     game.unapplyMove();
-                    if(nodeScore < beta) beta = nodeScore;
+                    if(nodeScore < beta) {
+                        beta = nodeScore;
+                        //update move
+                        this.blackNextMove = moves[i];
+                    }
                     if(alpha >= beta) break; //no-need to consider further
                 }
                 return beta;
@@ -195,6 +203,10 @@ public class Player {
                         "Player should be WHITE/BLACK";
                 return Integer.MIN_VALUE;
         }
+    }
+
+    private int scoreCalculation() {
+        return 0;
     }
 
     private boolean searchEndCondition() {
