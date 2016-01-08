@@ -144,7 +144,11 @@ public class Player {
 
     }
 
-    public void makeMove(){ //computerPlayer logic, random for now
+    public void makeMove() { //computerPlayer
+        ComputerPlayer.makeMove(this);
+    }
+
+    public void makeRandomMove(){ //random computerPlayer
         Move[] possibleMoves = getAllValidMoves();
         int numMoves = possibleMoves.length;
         int moveIndex = new Random().nextInt(numMoves);
