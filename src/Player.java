@@ -165,7 +165,7 @@ public class Player {
         Move[] moves = getAllValidMoves();
 
         if(moves.length == 0 || level == 20 || searchEndCondition()) {
-            return scoreCalculation();//might need to also return a move
+            return scoreCalculation(player);//might need to also return a move
         }
 
         switch (player) {
@@ -205,12 +205,31 @@ public class Player {
         }
     }
 
-    private int scoreCalculation() {
-        return 0;
+    private int scoreCalculation(Color player) {
+        //if draw,stealmate -> 0
+       if(GameUtil.stealMate(board, player, game.getLastMove()))
+           return 0;
+
+       if(GameUtil.pawnOnLastRank(board, player))
+            return infinite(player);
+
+       //TODO: position evaluation
     }
 
+    private int infinite(Color player) {
+        switch(player) {
+            case WHITE:
+                return Integer.MAX_VALUE;
+            case BLACK:
+                return Integer.MIN_VALUE;
+            default:
+                assert(true):
+                        "Player should be Black/White";
+                return 0;
+        }
+    }
     private boolean searchEndCondition() {
-        //TODO
+        //TODO if another end condition comes in mind
         return false;
     }
 }
