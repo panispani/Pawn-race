@@ -144,15 +144,61 @@ public class Player {
 
     }
 
-    public void makeMove() { //computerPlayer
-        ComputerPlayer.makeMove(this);
-    }
-
     public void makeRandomMove(){ //random computerPlayer
         Move[] possibleMoves = getAllValidMoves();
         int numMoves = possibleMoves.length;
         int moveIndex = new Random().nextInt(numMoves);
         Move nextMove = possibleMoves[moveIndex];
         game.applyMove(nextMove);
+    }
+
+    public void makeMove(Player p1, Game game) { //computerPlayer
+        minimax(0, p1.getPlayerColor(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+    }
+
+    public int minimax(int level, Color player, int alpha, int beta) {
+        //ending condition
+        int nodeScore = 0;
+        Move[] moves = getAllValidMoves();
+
+        if(moves.length == 0 || searchEndCondition()) {
+
+            ; //score calculation TODO
+        }
+
+
+        switch (player) {
+            case WHITE:
+                for(int i = 0; i < moves.length; i++) {
+                    //apply move
+                    game.applyMove(moves[i]);
+                    nodeScore = minimax(level + 1, opponentColor, alpha, beta);
+                    //unapply move
+                    game.unapplyMove();
+                    if(nodeScore > alpha) alpha = nodeScore;
+                    if(alpha >= beta) break; //no-need to consider further
+                }
+                return alpha;
+            case BLACK:
+                for(int i = 0; i < moves.length; i++) {
+                    game.applyMove(moves[i]);
+                    nodeScore = minimax(level + 1, opponentColor, alpha, beta);
+                    game.unapplyMove();
+                    if(nodeScore < beta) beta = nodeScore;
+                    if(alpha >= beta) break; //no-need to consider further
+                }
+                return beta;
+
+            default:
+                assert(true):
+                        "Player should be WHITE/BLACK";
+                return Integer.MIN_VALUE;
+        }
+    }
+
+    private boolean searchEndCondition() {
+        //TODO
+        return false;
     }
 }
