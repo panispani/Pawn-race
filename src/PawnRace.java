@@ -6,19 +6,36 @@ import java.util.Scanner;
  */
 public class PawnRace {
     public static void main(String[] args) {
+        boolean isHumanPlayer1;
+        boolean isHumanPlayer2;
+        char whiteGap;
+        char blackGap;
 
-        boolean isHumanPlayer1 = args[0].equals("H");
-        boolean isHumanPlayer2 = args[1].equals("H");
+        Scanner input = new Scanner(System.in);
 
-        char whiteGap = args[2].charAt(0);
-        char blackGap = args[3].charAt(0);
+        //Game Parameters
+        if(args.length == 4) {
+            isHumanPlayer1 = args[0].equals("H");
+            isHumanPlayer2 = args[1].equals("H");
+
+            whiteGap = args[2].charAt(0);
+            blackGap = args[3].charAt(0);
+        } else {
+            System.out.println("Please give the 2 player types (C - Computer, H - human) ");
+            isHumanPlayer1 = input.next().charAt(0) == 'H';
+            isHumanPlayer2 = input.next().charAt(0) == 'H';
+
+            System.out.println("Please give the columns where white and black miss a pawn (A - H)");
+            whiteGap = input.next().charAt(0);
+            blackGap = input.next().charAt(0);
+            //TO ADD validity check
+        }
 
         Board board = new Board(whiteGap, blackGap);
         Game game = new Game(board);
         Player p1 = new Player(board, game, Color.WHITE, isHumanPlayer1);
         Player p2 = new Player(board, game, Color.BLACK, isHumanPlayer2);
         int playerTurn = 1;
-        Scanner input = new Scanner(System.in);
         String moveSAN;
         Move move;
         board.display();
