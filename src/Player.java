@@ -154,8 +154,8 @@ public class Player {
         game.applyMove(nextMove);
     }
 
-    public void makeMove(Player p1, Game game) { //computerPlayer
-        minimax(0, p1.getPlayerColor(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+    public void makeMove() { //computerPlayer
+        minimax(0, playerColor, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
     }
 
@@ -205,58 +205,109 @@ public class Player {
         }
     }
 
+    List<Square> myPassedPawnList = new ArrayList<Square>();
+    List<Square> oppPassedPawnList = new ArrayList<Square>();
+
     private int scoreCalculation(Color player) {
 
-        int score = 0;
-
         //if draw return 0
-       if(GameUtil.stealMate(board, player, game.getLastMove()))
+        if(GameUtil.stealMate(board, player, game.getLastMove()))
            return 0;
 
-        //if you won
-            //return HIGH
+        //if won/lost
+        if(game.isFinished()) {
+           Color winner = game.getGameResult();
+           return infinite(winner);
+        }
 
-       //if you lost
-            //return LOW
+        int score = 0;
+        //default false?
+        boolean whiteFile[] = new boolean[8];
+        boolean blackFile[] = new boolean[8];
+        int materialDifference = 0;
+        int support;
 
-       //spaceOfEachPawn 1 point
+        for(int file = 0; file < 8; file++) {
+            for(int rank = 0; rank < 8; rank++) {
+                switch (board.getSquare(file, rank).occupiedBy()) {
+                    case WHITE:
+                        score += (rank - 1); //space points
+                        if(whiteFile[file]) score--; //doubled pawns
+                        whiteFile[file] = true; //to check how many can block it
+                        materialDifference++;
 
-       //how many pawns can block each pawn (0, -1, -2)
+                        support = 0; //calc support points
+                        if(file > 0) {
+                            if(board.getSquare(file - 1, rank + 1).occupiedBy() == Color.BLACK)
+                                support--;
+                            if(board.getSquare(file - 1, rank - 1).occupiedBy() == Color.WHITE)
+                                support++;
+                        }
+                        if(file < 7) {
+                            if(board.getSquare(file + 1, rank + 1).occupiedBy() == Color.BLACK)
+                                support--;
+                            if(board.getSquare(file + 1, rank - 1).occupiedBy() == Color.WHITE)
+                                support++;
+                        }
+                        if(support < 0) //same as material
+                            score = score + 5 * support;
+
+                        break;
+                    case BLACK:
+                        score -= (7 - rank);
+                        if(blackFile[file]) score++;
+                        blackFile[file] = true;
+                        materialDifference--;
+
+                        support = 0;
+                        if(file > 0) {
+                            if(board.getSquare(file - 1, rank - 1).occupiedBy() == Color.WHITE)
+                                support--;
+                            if(board.getSquare(file - 1, rank + 1).occupiedBy() == Color.BLACK)
+                                support++;
+                        }
+                        if(file < 7) {
+                            if(board.getSquare(file + 1, rank - 1).occupiedBy() == Color.WHITE)
+                                support--;
+                            if(board.getSquare(file + 1, rank + 1).occupiedBy() == Color.BLACK)
+                                support++;
+                        }
+                        if(support < 0)
+                            score = score - 5 * support;
+                        
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        score = score + 5 * materialDifference; //maybe >5
 
 
-       //doubled pawns 1 point
+        //add to passedPawnList from moveApplication
+        //not calculated everytime, passed from parent to node - time efficient
 
-       //material difference 5
+        //calculate minMovesToLose heuristic value
+        //closer the passed pawn the more point it gains
 
-       //threatened - check if protected (-5)
+        for(int i = 0; i < myPassedPawnList.size(); i++) {
 
+        }
 
-       //if passedPawn
-            //if minmoves to lose less
-                //return HIGH
-            //else
-                //return LOw
+        for(int i = 0; i < oppPassedPawnList.size(); i++) {
 
-       //else
-            //if he passedPawn
-                //if min to win less
-                    //return HIGH
-                //else
-                    //return low
+        }
 
-
-       return score;
+        return score;
     }
 
     private int infinite(Color player) {
         switch(player) {
             case WHITE:
-                return Integer.MAX_VALUE;
+                return 10000; //inf
             case BLACK:
-                return Integer.MIN_VALUE;
+                return -10000;
             default:
-                assert(true):
-                        "Player should be Black/White";
                 return 0;
         }
     }
