@@ -206,14 +206,46 @@ public class Player {
     }
 
     private int scoreCalculation(Color player) {
-        //if draw,stealmate -> 0
+
+        int score = 0;
+
+        //if draw return 0
        if(GameUtil.stealMate(board, player, game.getLastMove()))
            return 0;
 
-       if(GameUtil.pawnOnLastRank(board, player))
-            return infinite(player);
+        //if you won
+            //return HIGH
 
-       //TODO: position evaluation
+       //if you lost
+            //return LOW
+
+       //spaceOfEachPawn 1 point
+
+       //how many pawns can block each pawn (0, -1, -2)
+
+
+       //doubled pawns 1 point
+
+       //material difference 5
+
+       //threatened - check if protected (-5)
+
+
+       //if passedPawn
+            //if minmoves to lose less
+                //return HIGH
+            //else
+                //return LOw
+
+       //else
+            //if he passedPawn
+                //if min to win less
+                    //return HIGH
+                //else
+                    //return low
+
+
+       return score;
     }
 
     private int infinite(Color player) {
