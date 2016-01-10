@@ -126,24 +126,23 @@ public class Player {
 
     public boolean isPassedPawn(Square square) {
         //no pawn can stop it from promoting
-        for(int rank = square.getY() + 1; rank < 8; rank++)
+       for(int rank = square.getY() + 1; rank < 8; rank++)
             if(board.getSquare(square.getX(), rank).occupiedBy() != Color.NONE)
                 return false;
 
-        if(square.getX() > 0){
+            if(square.getX() > 0){
             for(int rank = square.getY() + 1; rank < 8; rank++)
                 if(board.getSquare(square.getX() - 1, rank).occupiedBy() == Color.BLACK)
                     return false;
-        }
+            }
 
-        if(square.getX() < 7){
+            if(square.getX() < 7){
             for(int rank = square.getY() + 1; rank < 8; rank++)
                 if(board.getSquare(square.getX() + 1, rank).occupiedBy() == Color.BLACK)
                     return false;
-        }
+            }
 
-        return true;
-
+       return true;
     }
 
     public void makeRandomMove(){ //random computerPlayer
@@ -178,7 +177,7 @@ public class Player {
         int nodeScore;
         Move[] moves = getAllValidMoves(player);
 
-        if(moves.length == 0 || level == 4 || searchEndCondition()) {
+        if(moves.length == 0 || level == 15 || searchEndCondition()) {
             return scoreCalculation(player);
         }
         //revise alpha beta pruning
@@ -241,7 +240,6 @@ public class Player {
     }
 
     private int scoreCalculation(Color player) {
-
         //if draw return 0
         if(GameUtil.stealMate(board, player, game.getLastMove()))
            return 0;
@@ -313,13 +311,13 @@ public class Player {
 
                         support = 0;
                         if(file > 0) {
-                            if(board.getSquare(file - 1, rank - 1).occupiedBy() == Color.WHITE)
+                           if(board.getSquare(file - 1, rank - 1).occupiedBy() == Color.WHITE)
                                 support--;
                             if(board.getSquare(file - 1, rank + 1).occupiedBy() == Color.BLACK)
                                 support++;
                         }
                         if(file < 7) {
-                            if(board.getSquare(file + 1, rank - 1).occupiedBy() == Color.WHITE)
+                           if(board.getSquare(file + 1, rank - 1).occupiedBy() == Color.WHITE)
                                 support--;
                             if(board.getSquare(file + 1, rank + 1).occupiedBy() == Color.BLACK)
                                 support++;
