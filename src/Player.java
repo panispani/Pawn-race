@@ -159,21 +159,35 @@ public class Player {
 
     }
 
+    List<Square> whitePassedPawnList = new ArrayList<Square>();
+    List<Square> blackPassedPawnList = new ArrayList<Square>();
+
     public int minimax(int level, Color player, int alpha, int beta) {
         //ending condition
         int nodeScore;
         Move[] moves = getAllValidMoves();
 
         if(moves.length == 0 || level == 20 || searchEndCondition()) {
-            return scoreCalculation(player);//might need to also return a move
+            return scoreCalculation(player);
         }
-
+        //revise alpha beta pruning
         switch (player) {
             case WHITE:
                 for(int i = 0; i < moves.length; i++) {
                     //apply move
                     game.applyMove(moves[i]);
+
+                    //not calculated everytime, passed from parent to node - time efficient
+                    boolean addedPawn = false;
+                    if(isPassedPawn(moves[i].getTo()) && !isPassedPawn(moves[i].getFrom())) {
+                        addedPawn = true;
+                        whitePassedPawnList.add(moves[i].getTo());
+                    }
                     nodeScore = minimax(level + 1, opponentColor, alpha, beta);
+                    if(addedPawn) {
+                        whitePassedPawnList.remove(whitePassedPawnList.size() - 1); //TODO
+                    }
+
                     //unapply move
                     game.unapplyMove();
                     if(nodeScore > alpha) {
@@ -187,7 +201,17 @@ public class Player {
             case BLACK:
                 for(int i = 0; i < moves.length; i++) {
                     game.applyMove(moves[i]);
+
+                    boolean addedPawn = false;
+                    if(isPassedPawn(moves[i].getTo()) && !isPassedPawn(moves[i].getFrom())) {
+                        addedPawn = true;
+                        blackPassedPawnList.add(moves[i].getTo());
+                    }
                     nodeScore = minimax(level + 1, opponentColor, alpha, beta);
+                    if(addedPawn) {
+                        blackPassedPawnList.remove(blackPassedPawnList.size() - 1);
+                    }
+
                     game.unapplyMove();
                     if(nodeScore < beta) {
                         beta = nodeScore;
@@ -205,9 +229,6 @@ public class Player {
         }
     }
 
-    List<Square> myPassedPawnList = new ArrayList<Square>();
-    List<Square> oppPassedPawnList = new ArrayList<Square>();
-
     private int scoreCalculation(Color player) {
 
         //if draw return 0
@@ -222,6 +243,10 @@ public class Player {
 
         int score = 0;
         //default false?
+        int whiteSupportFile[] = new int[8];
+        int blackSupportFile[] = new int[8];
+        int whiteSpace[] = new int[8];
+        int blackSpace[] = new int[8];
         boolean whiteFile[] = new boolean[8];
         boolean blackFile[] = new boolean[8];
         int materialDifference = 0;
@@ -231,9 +256,17 @@ public class Player {
             for(int rank = 0; rank < 8; rank++) {
                 switch (board.getSquare(file, rank).occupiedBy()) {
                     case WHITE:
+                        whiteSpace[file] = Math.max(whiteSpace[file], rank - 1);
                         score += (rank - 1); //space points
                         if(whiteFile[file]) score--; //doubled pawns
                         whiteFile[file] = true; //to check how many can block it
+
+                        whiteSupportFile[file]++;
+                        if(file > 0)
+                            whiteSupportFile[file - 1]++;
+                        if(file < 7)
+                            whiteSupportFile[file + 1]++;
+
                         materialDifference++;
 
                         support = 0; //calc support points
@@ -254,9 +287,17 @@ public class Player {
 
                         break;
                     case BLACK:
+                        blackSpace[file] = Math.min(blackSpace[file], rank - 7);
                         score -= (7 - rank);
                         if(blackFile[file]) score++;
                         blackFile[file] = true;
+
+                        blackSupportFile[file]++;
+                        if(file > 0)
+                            blackSupportFile[file - 1]++;
+                        if(file < 7)
+                            blackSupportFile[file + 1]++;
+
                         materialDifference--;
 
                         support = 0;
@@ -274,7 +315,7 @@ public class Player {
                         }
                         if(support < 0)
                             score = score - 5 * support;
-                        
+
                         break;
                     default:
                         break;
@@ -284,19 +325,65 @@ public class Player {
         score = score + 5 * materialDifference; //maybe >5
 
 
-        //add to passedPawnList from moveApplication
-        //not calculated everytime, passed from parent to node - time efficient
-
         //calculate minMovesToLose heuristic value
         //closer the passed pawn the more point it gains
+        //find column score and aspiring winning pawns with more support
+        //calculate extra moves needed though
 
-        for(int i = 0; i < myPassedPawnList.size(); i++) {
+        int minMovesWhite = 1000;
+        int minMovesBlack = 1000;
+        int supporter;
+        for(int i = 0; i < whiteSupportFile.length; i++) {
+            if(whiteSupportFile[i] > blackSupportFile[i]) {
+                //can get a passed pawn, minMovesWhite
+                //whiteSpace, whiteSupportFile
+                if(i == 0)
+                    supporter = 7 - whiteSpace[i + 1];
+                else if(i == 7)
+                    supporter = 7 - whiteSpace[i - 1];
+                else
+                    supporter = 7 - Math.max(whiteSpace[i - 1], whiteSpace[i + 1]);
 
+                minMovesWhite = 7 - whiteSpace[i] + supporter - 2;
+            } else if(whiteSupportFile[i] < blackSupportFile[i]) {
+                //black passed pawn, minMovesBlack
+                if(i == 0)
+                    supporter = blackSpace[i + 1] + 7;
+                else if(i == 7)
+                    supporter = blackSpace[i - 1] + 7;
+                else
+                    supporter = 7 + Math.min(blackSpace[i - 1], blackSpace[i + 1]);
+                minMovesBlack = blackSpace[i] + 7 + supporter - 2;
+            }
         }
 
-        for(int i = 0; i < oppPassedPawnList.size(); i++) {
+        //support array, add supporters
+        //space array of each
+        //if supporters > corresponding
+            //add space + dist_to_support
+            //dist_to_support is the others space - 2
 
+        int whiteBestPassed = -1;
+        int blackBestPassed = -1;
+
+        for(int i = 0; i < whitePassedPawnList.size(); i++) {
+            //find best passed distance
+            whiteBestPassed = Math.max(whiteBestPassed, whitePassedPawnList.get(i).getY());
         }
+
+        for(int i = 0; i < blackPassedPawnList.size(); i++) {
+            //find best passed distance
+            blackBestPassed = Math.max(blackBestPassed, blackPassedPawnList.get(i).getY());
+        }
+
+        if(whiteBestPassed == -1 && blackBestPassed == -1)
+            return score;
+
+        if(whiteBestPassed > blackBestPassed && whiteBestPassed > minMovesBlack)
+            score += 1000;
+
+        if(blackBestPassed > whiteBestPassed && blackBestPassed > minMovesWhite)
+            score -= 1000;
 
         return score;
     }
