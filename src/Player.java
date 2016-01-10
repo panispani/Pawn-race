@@ -5,6 +5,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Player {
 
@@ -48,7 +49,7 @@ public class Player {
         return pawnList.toArray(new Square[pawnList.size()]);
     }
 
-    public Move[] getAllValidMoves() {
+    public Move[] getAllValidMoves(Color player) {
         Square[] pawnList = getAllPawns();
         List<Move> moveList = new ArrayList<Move>();
         for(int i = 0; i < pawnList.length; i++) {
@@ -57,7 +58,7 @@ public class Player {
             int rank = from.getY();
             Square to;
             Move move;
-            int direction = GameUtil.getDirectionOfPawn(playerColor);
+            int direction = GameUtil.getDirectionOfPawn(player);
             //normal move
             if(board.getSquare(file, rank + direction).occupiedBy() == Color.NONE){
                 to = board.getSquare(file, rank + direction);
@@ -92,7 +93,6 @@ public class Player {
             }
 
             //enPassantCapture
-
             Move lastMove = game.getLastMove();
             if(lastMove != null) {
                 if(file > 0) {
@@ -120,7 +120,7 @@ public class Player {
                 }
             }
         }
-        GameUtil.printValidMoves(moveList.toArray(new Move[moveList.size()]));
+        //GameUtil.printValidMoves(moveList.toArray(new Move[moveList.size()]));
         return moveList.toArray(new Move[moveList.size()]);
     }
 
@@ -147,7 +147,7 @@ public class Player {
     }
 
     public void makeRandomMove(){ //random computerPlayer
-        Move[] possibleMoves = getAllValidMoves();
+        Move[] possibleMoves = getAllValidMoves(playerColor);
         int numMoves = possibleMoves.length;
         int moveIndex = new Random().nextInt(numMoves);
         Move nextMove = possibleMoves[moveIndex];
@@ -156,7 +156,18 @@ public class Player {
 
     public void makeMove() { //computerPlayer
         minimax(0, playerColor, Integer.MIN_VALUE, Integer.MAX_VALUE);
-
+        switch (playerColor) {
+            case WHITE:
+                game.applyMove(this.whiteNextMove);
+                break;
+            case BLACK:
+                game.applyMove(this.blackNextMove);
+                break;
+            default:
+                assert(true) :
+                        "Player should be BLACK/WHITE";
+                break;
+        }
     }
 
     List<Square> whitePassedPawnList = new ArrayList<Square>();
@@ -165,9 +176,9 @@ public class Player {
     public int minimax(int level, Color player, int alpha, int beta) {
         //ending condition
         int nodeScore;
-        Move[] moves = getAllValidMoves();
+        Move[] moves = getAllValidMoves(player);
 
-        if(moves.length == 0 || level == 20 || searchEndCondition()) {
+        if(moves.length == 0 || level == 4 || searchEndCondition()) {
             return scoreCalculation(player);
         }
         //revise alpha beta pruning
@@ -185,7 +196,7 @@ public class Player {
                     }
                     nodeScore = minimax(level + 1, opponentColor, alpha, beta);
                     if(addedPawn) {
-                        whitePassedPawnList.remove(whitePassedPawnList.size() - 1); //TODO
+                        whitePassedPawnList.remove(whitePassedPawnList.size() - 1);
                     }
 
                     //unapply move
