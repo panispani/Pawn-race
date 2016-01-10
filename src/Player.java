@@ -207,6 +207,7 @@ public class Player {
                     if(nodeScore > alpha) {
                         alpha = nodeScore;
                         //update move
+                        if(level == 0)
                         this.whiteNextMove = moves[i];
                     }
                     if(alpha >= beta) break; //no-need to consider further
@@ -230,6 +231,7 @@ public class Player {
                     if(nodeScore < beta) {
                         beta = nodeScore;
                         //update move
+                        if(level == 0)
                         this.blackNextMove = moves[i];
                     }
                     if(alpha >= beta) break; //no-need to consider further
