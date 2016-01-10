@@ -37,12 +37,12 @@ public class Player {
         return isComputerPlayer;
     }
 
-    public Square[] getAllPawns() {
+    public Square[] getAllPawns(Color player) {
         //array of player pawns
         List<Square> pawnList = new ArrayList<Square>();
         for(int file = 0; file < 8; file++) {
             for(int rank = 0; rank < 8; rank++) {
-                if(board.getSquare(file, rank).occupiedBy() == playerColor)
+                if(board.getSquare(file, rank).occupiedBy() == player)
                     pawnList.add(board.getSquare(file, rank));
             }
         }
@@ -50,7 +50,10 @@ public class Player {
     }
 
     public Move[] getAllValidMoves(Color player) {
-        Square[] pawnList = getAllPawns();
+
+        Color opponent = GameUtil.oppositePlayer(player);
+
+        Square[] pawnList = getAllPawns(player);
         List<Move> moveList = new ArrayList<Move>();
         for(int i = 0; i < pawnList.length; i++) {
             Square from = pawnList[i];
@@ -67,7 +70,7 @@ public class Player {
             }
 
             //enPassant
-            if(!GameUtil.haveMovedPawn(rank, playerColor) &&
+            if(!GameUtil.haveMovedPawn(rank, player) &&
                     (board.getSquare(file, rank + direction).occupiedBy() == Color.NONE) &&
                     (board.getSquare(file, rank + 2 * direction).occupiedBy() == Color.NONE)){
                 to = board.getSquare(file, rank + 2 * direction);
@@ -77,7 +80,7 @@ public class Player {
 
             //capture
             if(file > 0) {
-                if(board.getSquare(file - 1, rank + direction).occupiedBy() == opponentColor) {
+                if(board.getSquare(file - 1, rank + direction).occupiedBy() == opponent) {
                     to = board.getSquare(file - 1, rank + direction);
                     move = new Move(from, to, true, false);
                     moveList.add(move);
@@ -85,7 +88,7 @@ public class Player {
             }
 
             if(file < 7) {
-                if(board.getSquare(file + 1, rank + direction).occupiedBy() == opponentColor) {
+                if(board.getSquare(file + 1, rank + direction).occupiedBy() == opponent) {
                     to = board.getSquare(file + 1, rank + direction);
                     move = new Move(from, to, true, false);
                     moveList.add(move);
@@ -96,7 +99,7 @@ public class Player {
             Move lastMove = game.getLastMove();
             if(lastMove != null) {
                 if(file > 0) {
-                    if(board.getSquare(file - 1, rank).occupiedBy() == opponentColor &&
+                    if(board.getSquare(file - 1, rank).occupiedBy() == opponent &&
                             (board.getSquare(file - 1, rank + direction).occupiedBy() == Color.NONE) &&
                             GameUtil.moveIsEnPassant(lastMove) &&
                             (lastMove.getTo(). getX() == file - 1) &&
@@ -107,7 +110,7 @@ public class Player {
                     }
 
                     if(file < 7) {
-                        if (board.getSquare(file + 1, rank).occupiedBy() == opponentColor &&
+                        if (board.getSquare(file + 1, rank).occupiedBy() == opponent &&
                                 (board.getSquare(file + 1, rank + direction).occupiedBy() == Color.NONE) &&
                                 GameUtil.moveIsEnPassant(lastMove) &&
                                 (lastMove.getTo().getX() == file + 1) &&
@@ -175,9 +178,10 @@ public class Player {
     public int minimax(int level, Color player, int alpha, int beta) {
         //ending condition
         int nodeScore;
+        Color opponent = GameUtil.oppositePlayer(player);
         Move[] moves = getAllValidMoves(player);
 
-        if(moves.length == 0 || level == 15 || searchEndCondition()) {
+        if(game.isFinished() || moves.length == 0 || level == 4 || searchEndCondition()) {
             return scoreCalculation(player);
         }
         //revise alpha beta pruning
@@ -193,7 +197,7 @@ public class Player {
                         addedPawn = true;
                         whitePassedPawnList.add(moves[i].getTo());
                     }
-                    nodeScore = minimax(level + 1, opponentColor, alpha, beta);
+                    nodeScore = minimax(level + 1, opponent, alpha, beta);
                     if(addedPawn) {
                         whitePassedPawnList.remove(whitePassedPawnList.size() - 1);
                     }
@@ -217,7 +221,7 @@ public class Player {
                         addedPawn = true;
                         blackPassedPawnList.add(moves[i].getTo());
                     }
-                    nodeScore = minimax(level + 1, opponentColor, alpha, beta);
+                    nodeScore = minimax(level + 1, opponent, alpha, beta);
                     if(addedPawn) {
                         blackPassedPawnList.remove(blackPassedPawnList.size() - 1);
                     }
