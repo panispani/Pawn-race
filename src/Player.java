@@ -16,7 +16,7 @@ public class Player {
     private boolean isComputerPlayer;
     private Move whiteNextMove;
     private Move blackNextMove;
-    private final int MATERIAL = 8;
+    private final int MATERIAL = 10;
 
     public Player(Board board, Game game, Color color, boolean isComputerPlayer) {
         this.board         = board;
@@ -381,7 +381,7 @@ public class Player {
             //dist_to_support is the others space - 2
 
         int whiteBestPassed = -1;
-        int blackBestPassed = -1;
+        int blackBestPassed = 100;
 
         for(int i = 0; i < whitePassedPawnList.size(); i++) {
             //find best passed distance
@@ -390,16 +390,18 @@ public class Player {
 
         for(int i = 0; i < blackPassedPawnList.size(); i++) {
             //find best passed distance
-            blackBestPassed = Math.max(blackBestPassed, blackPassedPawnList.get(i).getY());
+            blackBestPassed = Math.min(blackBestPassed, blackPassedPawnList.get(i).getY());
         }
 
-        if(whiteBestPassed == -1 && blackBestPassed == -1)
+
+        if(whiteBestPassed == -1 && blackBestPassed == 100)
             return score;
 
-        if(whiteBestPassed > blackBestPassed && whiteBestPassed > minMovesBlack)
+        whiteBestPassed = 7 - whiteBestPassed;
+        if(whiteBestPassed < blackBestPassed && whiteBestPassed < minMovesBlack)
             score += 1000;
 
-        if(blackBestPassed > whiteBestPassed && blackBestPassed > minMovesWhite)
+        if(blackBestPassed < whiteBestPassed && blackBestPassed < minMovesWhite)
             score -= 1000;
 
         return score;
