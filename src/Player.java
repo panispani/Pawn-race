@@ -16,6 +16,7 @@ public class Player {
     private boolean isComputerPlayer;
     private Move whiteNextMove;
     private Move blackNextMove;
+    private final int MATERIAL = 8;
 
     public Player(Board board, Game game, Color color, boolean isComputerPlayer) {
         this.board         = board;
@@ -181,7 +182,7 @@ public class Player {
         Color opponent = GameUtil.oppositePlayer(player);
         Move[] moves = getAllValidMoves(player);
 
-        if(game.isFinished() || moves.length == 0 || level == 4 || searchEndCondition()) {
+        if(game.isFinished() || moves.length == 0 || level == 7 || searchEndCondition()) {
             return scoreCalculation(player);
         }
         //revise alpha beta pruning
@@ -231,6 +232,7 @@ public class Player {
                     if(nodeScore < beta) {
                         beta = nodeScore;
                         //update move
+                        //Take in account that shorter wins are better..
                         if(level == 0)
                         this.blackNextMove = moves[i];
                     }
@@ -298,7 +300,7 @@ public class Player {
                                 support++;
                         }
                         if(support < 0) //same as material
-                            score = score + 5 * support;
+                            score = score + MATERIAL * support;
 
                         break;
                     case BLACK:
@@ -329,7 +331,7 @@ public class Player {
                                 support++;
                         }
                         if(support < 0)
-                            score = score - 5 * support;
+                            score = score - MATERIAL * support;
 
                         break;
                     default:
@@ -337,7 +339,7 @@ public class Player {
                 }
             }
         }
-        score = score + 5 * materialDifference; //maybe >5
+        score = score + MATERIAL * materialDifference; //maybe >5
 
 
         //calculate minMovesToLose heuristic value
