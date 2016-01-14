@@ -86,7 +86,7 @@ public class Game {
                 return Color.BLACK;
             if(GameUtil.blackIsOutOfPawns(board))
                 return Color.WHITE;
-            assert(true):
+            assert(false):
                     "Game shouldn't be finished";
 
         }

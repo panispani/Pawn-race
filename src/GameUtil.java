@@ -121,7 +121,7 @@ public class GameUtil {
         switch(playerColor){
             case WHITE: return rank != 1;
             case BLACK: return rank != 6;
-            default: assert(true): "Player should be BLACK/WHITE"; return false;
+            default: assert(false): "Player should be BLACK/WHITE"; return false;
         }
     }
 
@@ -129,7 +129,7 @@ public class GameUtil {
         switch(pawn) {
             case WHITE: return 1;
             case BLACK: return -1;
-            default: assert(true): "Pawn should be WHITE/BLACK"; return 0;
+            default: assert(false): "Pawn should be WHITE/BLACK"; return 0;
         }
     }
 

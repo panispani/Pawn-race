@@ -17,6 +17,7 @@ public class Player {
     private Move whiteNextMove;
     private Move blackNextMove;
     private final int MATERIAL = 10;
+    private int movesDone = 0;
 
     public Player(Board board, Game game, Color color, boolean isComputerPlayer) {
         this.board         = board;
@@ -157,7 +158,46 @@ public class Player {
         game.applyMove(nextMove);
     }
 
+    private void whiteOpeningRepertoire() {
+        //promote adjacent pawns to his gap
+        
+    }
+
+    private void blackOpeningRepertoire() {
+        //promote pawns adjacent to his gap
+        //if gap is a/h setup the win
+        if(board.getWhiteGap() == 'A' || board.getWhiteGap() == 'H') {
+            if(game.getLastMove().getTo().getX() == 1 && game.getLastMove().getTo().getY() == 4) {
+                //b3
+            } else {
+                //move list to choose from is capture, b4 c4 a4
+            }
+
+        } else {
+            //just play move adjacent to gap
+        }
+
+    }
+
     public void makeMove() { //computerPlayer
+
+        if (movesDone < 3) {
+            switch(playerColor) {
+                case WHITE:
+                    whiteOpeningRepertoire();
+                    break;
+                case BLACK:
+                    blackOpeningRepertoire();
+                    break;
+                default:
+                    assert(false):
+                            "Player should be Black/White";
+                    break;
+            }
+            //movesDone++;
+            //return;
+        }
+        movesDone++;
         minimax(0, playerColor, Integer.MIN_VALUE, Integer.MAX_VALUE);
         switch (playerColor) {
             case WHITE:
@@ -167,7 +207,7 @@ public class Player {
                 game.applyMove(this.blackNextMove);
                 break;
             default:
-                assert(true) :
+                assert(false) :
                         "Player should be BLACK/WHITE";
                 break;
         }
@@ -229,6 +269,7 @@ public class Player {
                     }
 
                     game.unapplyMove();
+
                     if(nodeScore < beta) {
                         beta = nodeScore;
                         //update move
@@ -241,7 +282,7 @@ public class Player {
                 return beta;
 
             default:
-                assert(true):
+                assert(false):
                         "Player should be WHITE/BLACK";
                 return Integer.MIN_VALUE;
         }
@@ -274,7 +315,7 @@ public class Player {
                 switch (board.getSquare(file, rank).occupiedBy()) {
                     case WHITE:
                         whiteSpace[file] = Math.max(whiteSpace[file], rank - 1);
-                        score += (rank - 1); //space points
+                        //score += (rank - 1); //space points
                         if(whiteFile[file]) score--; //doubled pawns
                         whiteFile[file] = true; //to check how many can block it
 
@@ -305,7 +346,7 @@ public class Player {
                         break;
                     case BLACK:
                         blackSpace[file] = Math.min(blackSpace[file], rank - 7);
-                        score -= (7 - rank);
+                        //score -= (7 - rank);
                         if(blackFile[file]) score++;
                         blackFile[file] = true;
 

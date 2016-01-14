@@ -4,6 +4,15 @@
 public class Board {
 
     private Square[][] board = new Square[8][8];
+    private int whiteGap, blackGap;
+
+    public int getBlackGap() {
+        return blackGap;
+    }
+
+    public int getWhiteGap() {
+        return whiteGap;
+    }
 
     public Board(char whiteGap, char blackGap) {
 
@@ -13,7 +22,8 @@ public class Board {
         assert(whiteGap >= 'A' && blackGap >= 'A' &&
                 whiteGap <= 'H' && blackGap <= 'H'):
                 "invalid pawn gaps";
-
+        this.whiteGap = whiteGap - 'A';
+        this.blackGap = blackGap - 'A';
         //initial board setup
         for(int file = 0; file < 8; file++) {
             for(int rank = 0; rank < 8; rank++) {

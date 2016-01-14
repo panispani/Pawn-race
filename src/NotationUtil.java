@@ -31,7 +31,7 @@ public class NotationUtil {
             else if(board.getSquare(file, rank - 2 * direction).occupiedBy() == color) {
                 return "" + (char)(file + 'a') + (char)(rank - 2 * direction + '1') + '-' + san;
             }
-            assert(true) : "Invalid move";
+            assert(false) : "Invalid move";
             return null;
         }
 
@@ -45,7 +45,7 @@ public class NotationUtil {
         }
 
         //invalid move
-        assert(true):
+        assert(false):
                 "move is not valid";
         return null;
 

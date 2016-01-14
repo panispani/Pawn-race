@@ -10,7 +10,7 @@ public class Square {
     public Square(int x, int y) {
 
         assert(x >=0 && x < 8
-                && y >=0 && y <8):
+                && y >=0 && y < 8):
                 "Invalid square: " + x + " " + y;
 
         this.x = x;
