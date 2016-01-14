@@ -16,8 +16,9 @@ public class Player {
     private boolean isComputerPlayer;
     private Move whiteNextMove;
     private Move blackNextMove;
-    private final int MATERIAL = 10;
+    private final int MATERIAL = 50;
     private int movesDone = 0;
+    private  Square[] pawnList;
 
     public Player(Board board, Game game, Color color, boolean isComputerPlayer) {
         this.board         = board;
@@ -55,7 +56,7 @@ public class Player {
 
         Color opponent = GameUtil.oppositePlayer(player);
 
-        Square[] pawnList = getAllPawns(player);
+        pawnList = getAllPawns(player);
         List<Move> moveList = new ArrayList<Move>();
         for(int i = 0; i < pawnList.length; i++) {
             Square from = pawnList[i];
@@ -64,18 +65,18 @@ public class Player {
             Square to;
             Move move;
             int direction = GameUtil.getDirectionOfPawn(player);
-            //normal move
-            if(board.getSquare(file, rank + direction).occupiedBy() == Color.NONE){
-                to = board.getSquare(file, rank + direction);
-                move = new Move(from, to, false, false);
-                moveList.add(move);
-            }
-
             //enPassant
             if(!GameUtil.haveMovedPawn(rank, player) &&
                     (board.getSquare(file, rank + direction).occupiedBy() == Color.NONE) &&
                     (board.getSquare(file, rank + 2 * direction).occupiedBy() == Color.NONE)){
                 to = board.getSquare(file, rank + 2 * direction);
+                move = new Move(from, to, false, false);
+                moveList.add(move);
+            }
+
+            //normal move
+            if(board.getSquare(file, rank + direction).occupiedBy() == Color.NONE){
+                to = board.getSquare(file, rank + direction);
                 move = new Move(from, to, false, false);
                 moveList.add(move);
             }
@@ -130,26 +131,50 @@ public class Player {
     }
 
     public boolean isPassedPawn(Square square) {
-        //no pawn can stop it from promoting
-       for(int rank = square.getY() + 1; rank < 8; rank++)
-            if(board.getSquare(square.getX(), rank).occupiedBy() != Color.NONE)
-                return false;
+       //no pawn can stop it from promoting
+       Color opponent = GameUtil.oppositePlayer(square.occupiedBy());
+       switch(opponent) {
+           case BLACK:
+               for(int rank = square.getY() + 1; rank < 8; rank++)
+                   if(board.getSquare(square.getX(), rank).occupiedBy() != Color.NONE)
+                       return false;
 
-            if(square.getX() > 0){
-            for(int rank = square.getY() + 1; rank < 8; rank++)
-                if(board.getSquare(square.getX() - 1, rank).occupiedBy() == Color.BLACK)
-                    return false;
-            }
+               if(square.getX() > 0){
+                   for(int rank = square.getY() + 1; rank < 8; rank++)
+                       if(board.getSquare(square.getX() - 1, rank).occupiedBy() == opponent)
+                           return false;
+               }
 
-            if(square.getX() < 7){
-            for(int rank = square.getY() + 1; rank < 8; rank++)
-                if(board.getSquare(square.getX() + 1, rank).occupiedBy() == Color.BLACK)
-                    return false;
-            }
+               if(square.getX() < 7){
+                   for(int rank = square.getY() + 1; rank < 8; rank++)
+                       if(board.getSquare(square.getX() + 1, rank).occupiedBy() == opponent)
+                           return false;
+               }
+               break;
+           case WHITE: //8 to 0
+               for(int rank = square.getY() - 1; rank >= 0; rank--)
+                   if(board.getSquare(square.getX(), rank).occupiedBy() != Color.NONE)
+                       return false;
 
+               if(square.getX() > 0){
+                   for(int rank = square.getY() - 1; rank >= 0; rank--)
+                       if(board.getSquare(square.getX() - 1, rank).occupiedBy() == opponent)
+                           return false;
+               }
+
+               if(square.getX() < 7){
+                   for(int rank = square.getY() - 1; rank >= 0; rank--)
+                       if(board.getSquare(square.getX() + 1, rank).occupiedBy() == opponent)
+                           return false;
+               }
+               break;
+           default:
+               break;
+       }
+        
        return true;
     }
-
+    
     public void makeRandomMove(){ //random computerPlayer
         Move[] possibleMoves = getAllValidMoves(playerColor);
         int numMoves = possibleMoves.length;
@@ -213,8 +238,8 @@ public class Player {
         }
     }
 
-    List<Square> whitePassedPawnList = new ArrayList<Square>();
-    List<Square> blackPassedPawnList = new ArrayList<Square>();
+    //List<Square> whitePassedPawnList = new ArrayList<Square>();
+    //List<Square> blackPassedPawnList = new ArrayList<Square>();
 
     public int minimax(int level, Color player, int alpha, int beta) {
         //ending condition
@@ -225,7 +250,7 @@ public class Player {
         if(game.isFinished() || moves.length == 0 || level == 7 || searchEndCondition()) {
             return scoreCalculation(player);
         }
-        //revise alpha beta pruning
+        //alpha beta pruning
         switch (player) {
             case WHITE:
                 for(int i = 0; i < moves.length; i++) {
@@ -233,15 +258,15 @@ public class Player {
                     game.applyMove(moves[i]);
 
                     //not calculated everytime, passed from parent to node - time efficient
-                    boolean addedPawn = false;
+                    /*boolean addedPawn = false;
                     if(isPassedPawn(moves[i].getTo()) && !isPassedPawn(moves[i].getFrom())) {
                         addedPawn = true;
                         whitePassedPawnList.add(moves[i].getTo());
-                    }
+                    }*/
                     nodeScore = minimax(level + 1, opponent, alpha, beta);
-                    if(addedPawn) {
+                    /*if(addedPawn) {
                         whitePassedPawnList.remove(whitePassedPawnList.size() - 1);
-                    }
+                    }*/
 
                     //unapply move
                     game.unapplyMove();
@@ -258,15 +283,15 @@ public class Player {
                 for(int i = 0; i < moves.length; i++) {
                     game.applyMove(moves[i]);
 
-                    boolean addedPawn = false;
+                    /*boolean addedPawn = false;
                     if(isPassedPawn(moves[i].getTo()) && !isPassedPawn(moves[i].getFrom())) {
                         addedPawn = true;
                         blackPassedPawnList.add(moves[i].getTo());
-                    }
+                    }*/
                     nodeScore = minimax(level + 1, opponent, alpha, beta);
-                    if(addedPawn) {
+                    /*if(addedPawn) {
                         blackPassedPawnList.remove(blackPassedPawnList.size() - 1);
-                    }
+                    }*/
 
                     game.unapplyMove();
 
@@ -345,8 +370,8 @@ public class Player {
 
                         break;
                     case BLACK:
-                        blackSpace[file] = Math.min(blackSpace[file], rank - 7);
-                        //score -= (7 - rank);
+                        blackSpace[file] = Math.min(blackSpace[file], rank - 6);
+                        //score -= (6 - rank);
                         if(blackFile[file]) score++;
                         blackFile[file] = true;
 
@@ -414,7 +439,6 @@ public class Player {
                 minMovesBlack = blackSpace[i] + 7 + supporter - 2;
             }
         }
-
         //support array, add supporters
         //space array of each
         //if supporters > corresponding
@@ -424,14 +448,23 @@ public class Player {
         int whiteBestPassed = -1;
         int blackBestPassed = 100;
 
-        for(int i = 0; i < whitePassedPawnList.size(); i++) {
-            //find best passed distance
-            whiteBestPassed = Math.max(whiteBestPassed, whitePassedPawnList.get(i).getY());
-        }
-
-        for(int i = 0; i < blackPassedPawnList.size(); i++) {
-            //find best passed distance
-            blackBestPassed = Math.min(blackBestPassed, blackPassedPawnList.get(i).getY());
+        for(int file = 0; file < 8; file++) {
+            for(int rank = 0; rank < 8; rank++) {
+                switch (board.getSquare(file, rank).occupiedBy()) {
+                    case WHITE:
+                        if(isPassedPawn(board.getSquare(file, rank))) {
+                            whiteBestPassed = Math.max(whiteBestPassed, rank);
+                        }
+                        break;
+                    case BLACK:
+                        if(isPassedPawn(board.getSquare(file, rank))) {
+                            blackBestPassed = Math.min(blackBestPassed, rank);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
 
@@ -440,10 +473,10 @@ public class Player {
 
         whiteBestPassed = 7 - whiteBestPassed;
         if(whiteBestPassed < blackBestPassed && whiteBestPassed < minMovesBlack)
-            score += 1000;
+            score += 10000;
 
         if(blackBestPassed < whiteBestPassed && blackBestPassed < minMovesWhite)
-            score -= 1000;
+            score -= 10000;
 
         return score;
     }
