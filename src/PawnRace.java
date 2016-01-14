@@ -46,7 +46,7 @@ public class PawnRace {
                     
                     do {
                         System.out.println("Play your move! ");
-                        moveSAN = input.next();
+                        moveSAN = input.next().toLowerCase();
                     }while(!NotationUtil.validStringMove(moveSAN.toLowerCase(), Color.WHITE, board));
                     moveSAN = NotationUtil.toStandardNotation(moveSAN, Color.WHITE, board);
                     move = game.parseMove(moveSAN);
@@ -64,7 +64,7 @@ public class PawnRace {
 
                     do {
                         System.out.println("Play your move! ");
-                        moveSAN = input.next();
+                        moveSAN = input.next().toLowerCase();
                     } while(!NotationUtil.validStringMove(moveSAN.toLowerCase(), Color.BLACK, board));
                     moveSAN = NotationUtil.toStandardNotation(moveSAN, Color.BLACK, board);
 
