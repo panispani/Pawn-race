@@ -9,27 +9,29 @@ This is an attempt to implement this game and also a Computer player using the M
 The Computer player replies within 5 seconds.
 
 This is an example setup with white gap on the A file and black gap on the G file.
-
-    A B C D E F G H
+```sh
+   A B C D E F G H
 
 8  . . . . . . . .  8
-7  ♙ ♙ ♙ ♙ ♙ ♙ . ♙  7
+7  ♟ ♟ ♟ ♟ ♟ ♟ . ♟  7
 6  . . . . . . . .  6
 5  . . . . . . . .  5
 4  . . . . . . . .  4
 3  . . . . . . . .  3
-2  . ♟ ♟ ♟ ♟ ♟ ♟ ♟  2
+2  . ♙ ♙ ♙ ♙ ♙ ♙ ♙  2
 1  . . . . . . . .  1
 
    A B C D E F G H
-   
+``` 
    
 # HOW TO RUN
 
 
 You can run the ready .class file by switching to the out/production/Pawn-race/ directory and running the PawnRace class
-`cd out/production/Pawn-race/`
-`java PawnRace`
+
+>`cd out/production/Pawn-race/`
+
+>`java PawnRace`
 
 
 # HOW TO PLAY
@@ -47,6 +49,7 @@ E.g. Example game on the above board
 (You can try it to understand the notation, just choose Human Vs Human(H H) at start)
 
 Short Algebraic notation
+```sh
 1.  f4 a5
 2.  g4 b5
 3.  g5 f5
@@ -58,8 +61,10 @@ Short Algebraic notation
 9.  f6 a3
 10. f7 a2
 11. f8
+```
 
 Standard Algebraic notation
+```sh
 1.  f2-f4 a7-a5
 2.  g2-g4 b7-b5
 3.  g4-g5 f7-f5
@@ -71,26 +76,27 @@ Standard Algebraic notation
 9.  f5-f6 a4-a3
 10. f6-f7 a3-a2
 11. f7-f8
+```
 
 
 Final Position
+```sh
    A B C D E F G H
 
-8  . . . . . ♟ . .  8
-7  . . . ♙ . . . ♙  7
+8  . . . . . ♙ . .  8
+7  . . . ♟ . . . ♟  7
 6  . . . . . . . .  6
-5  . . ♙ . ♙ . . .  5
-4  . ♙ . . . . . .  4
-3  . . ♟ . . . . .  3
-2  ♙ ♟ . ♟ . . . ♟  2
+5  . . ♟ . ♟ . . .  5
+4  . ♟ . . . . . .  4
+3  . . ♙ . . . . .  3
+2  ♟ ♙ . ♙ . . . ♙  2
 1  . . . . . . . .  1
 
    A B C D E F G H
-
+```
 WHITE HAS WON!!
 
 TIP: Black has a slight advantage
 This was done for the Imperial College London Pawn Race AI challenge.
 Enjoy!
-
 
