@@ -96,7 +96,7 @@ Final Position
 ```
 WHITE HAS WON!!
 
-TIP: Black has a slight advantage
+TIP: Black has a slight advantage.
 This was done for the Imperial College London Pawn Race AI challenge.
 Enjoy!
 
