@@ -65,6 +65,7 @@ public class Player {
             Square to;
             Move move;
             int direction = GameUtil.getDirectionOfPawn(player);
+            
             //enPassant
             if(!GameUtil.haveMovedPawn(rank, player) &&
                     (board.getSquare(file, rank + direction).occupiedBy() == Color.NONE) &&
@@ -90,6 +91,7 @@ public class Player {
                 }
             }
 
+            //capture
             if(file < 7) {
                 if(board.getSquare(file + 1, rank + direction).occupiedBy() == opponent) {
                     to = board.getSquare(file + 1, rank + direction);
@@ -126,7 +128,6 @@ public class Player {
                 }
             }
         }
-        //GameUtil.printValidMoves(moveList.toArray(new Move[moveList.size()]));
         return moveList.toArray(new Move[moveList.size()]);
     }
 
@@ -219,8 +220,6 @@ public class Player {
                             "Player should be Black/White";
                     break;
             }
-            //movesDone++;
-            //return;
         }
         movesDone++;
         minimax(0, playerColor, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -237,9 +236,6 @@ public class Player {
                 break;
         }
     }
-
-    //List<Square> whitePassedPawnList = new ArrayList<Square>();
-    //List<Square> blackPassedPawnList = new ArrayList<Square>();
 
     public int minimax(int level, Color player, int alpha, int beta) {
         //ending condition
@@ -258,15 +254,7 @@ public class Player {
                     game.applyMove(moves[i]);
 
                     //not calculated everytime, passed from parent to node - time efficient
-                    /*boolean addedPawn = false;
-                    if(isPassedPawn(moves[i].getTo()) && !isPassedPawn(moves[i].getFrom())) {
-                        addedPawn = true;
-                        whitePassedPawnList.add(moves[i].getTo());
-                    }*/
                     nodeScore = minimax(level + 1, opponent, alpha, beta);
-                    /*if(addedPawn) {
-                        whitePassedPawnList.remove(whitePassedPawnList.size() - 1);
-                    }*/
 
                     //unapply move
                     game.unapplyMove();
@@ -283,15 +271,7 @@ public class Player {
                 for(int i = 0; i < moves.length; i++) {
                     game.applyMove(moves[i]);
 
-                    /*boolean addedPawn = false;
-                    if(isPassedPawn(moves[i].getTo()) && !isPassedPawn(moves[i].getFrom())) {
-                        addedPawn = true;
-                        blackPassedPawnList.add(moves[i].getTo());
-                    }*/
                     nodeScore = minimax(level + 1, opponent, alpha, beta);
-                    /*if(addedPawn) {
-                        blackPassedPawnList.remove(blackPassedPawnList.size() - 1);
-                    }*/
 
                     game.unapplyMove();
 
@@ -313,6 +293,7 @@ public class Player {
         }
     }
 
+    // should probably break it down in a more sophisticated way
     private int scoreCalculation(Color player) {
         //if draw return 0
         if(GameUtil.stealMate(board, player, game.getLastMove()))
@@ -325,7 +306,6 @@ public class Player {
         }
 
         int score = 0;
-        //default false?
         int whiteSupportFile[] = new int[8];
         int blackSupportFile[] = new int[8];
         int whiteSpace[] = new int[8];
@@ -340,7 +320,6 @@ public class Player {
                 switch (board.getSquare(file, rank).occupiedBy()) {
                     case WHITE:
                         whiteSpace[file] = Math.max(whiteSpace[file], rank - 1);
-                        //score += (rank - 1); //space points
                         if(whiteFile[file]) score--; //doubled pawns
                         whiteFile[file] = true; //to check how many can block it
 
