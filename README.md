@@ -22,17 +22,15 @@ This is an example setup with white gap on the A file and black gap on the G fil
 1  . . . . . . . .  1
 
    A B C D E F G H
-``` 
-   
+```
+
 # HOW TO RUN
 
-
-You can run the ready .class file by switching to the out/production/Pawn-race/ directory and running the PawnRace class
-
->`cd out/production/Pawn-race/`
-
->`java PawnRace`
-
+```sh
+$ cd src
+$ javac PawnRace.java
+$ java PawnRace
+```
 
 # HOW TO PLAY
 
